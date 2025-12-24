@@ -141,17 +141,16 @@ class MessagingCommands(CommandHandlerBase):
     
         return None if res is None else result
 
-    async def send_chan_msg(self, chan, msg, timestamp=None) -> Event:
+    async def send_chan_msg(self, chan: int, msg: str, timestamp: Optional[int] = None) -> Event:
         logger.debug(f"Sending channel message to channel {chan}: {msg}")
 
         # Default to current time if timestamp not provided
         if timestamp is None:
             import time
-
-            timestamp = int(time.time()).to_bytes(4, "little")
+            timestamp = int(time.time())
 
         data = (
-            b"\x03\x00" + chan.to_bytes(1, "little") + timestamp + msg.encode("utf-8")
+            b"\x03\x00" + chan.to_bytes(1, "little") + timestamp.to_bytes(4, "little") + msg.encode("utf-8")
         )
         return await self.send(data, [EventType.OK, EventType.ERROR])
 
